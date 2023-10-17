@@ -1,60 +1,92 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../axiosConfig';
+import './DisplayVotables.css';
+import PieChart from '../components/PieChart';
+import { VOTE_LABELS } from '../components/constants';
 
 function DisplayVotables() {
     const [votables, setVotables] = useState([]);
-
-    const fetchVotables = async () => {
-        try {
-            const response = await axiosInstance.get('/api/v1/get_all_votables/');
-            console.log(response);
-            // Directly set the combined list of votables
-            setVotables(response.data);
-        } catch (error) {
-            console.error("Failed to fetch votables:", error.message);
-        }
-    };
+    const [orderBy, setOrderBy] = useState('created_at'); // Default to newest
 
     useEffect(() => {
-        fetchVotables();
-    }, []);
+        async function fetchVotables() {
+            try {
+                const response = await axiosInstance.get(`/api/v1/get_all_votables/?order_by=${orderBy}`);
+                setVotables(response.data);
+            } catch (error) {
+                console.error("Failed to fetch votables:", error.message);
+            }
+        }
 
-    const handleVote = async (votableType, objectId, voteValue) => {
+        fetchVotables();
+    }, [orderBy]);
+
+    const handleVote = async (votableId, voteValue) => {
         try {
-            const response = await axiosInstance.post(`/api/v1/vote/${votableType}/${objectId}/`, {
-                vote: voteValue
-            });
-            console.log(response.data);
-            // Refresh the votables list after voting
-            fetchVotables();
+            const voteResponse = await axiosInstance.post(`/api/v1/vote/${votableId}/`, { vote: voteValue });
+
+            if (voteResponse.status === 200) {
+                const response = await axiosInstance.get(`/api/v1/get_votable/${votableId}/`);
+                const updatedVotable = response.data;
+
+                setVotables(prevVotables => {
+                    return prevVotables.map(votable =>
+                        votable.id === updatedVotable.id ? updatedVotable : votable
+                    );
+                });
+            }
+
         } catch (error) {
             console.error("Failed to cast vote:", error.message);
         }
     };
 
     return (
-        <div>
-            <h1>Votables List</h1>
-            <ul>
-                {votables.map(votable => (
-                    <li key={votable.id}>
-                        <h3>{votable.title}</h3>
-                        <p>{votable.text}</p>
-                        <p>
-                            {votable.positive_label}: {votable.positive_votes} |
-                            {votable.negative_label}: {votable.negative_votes}
-                        </p>
-                        <p><em>Type: {votable.votable_type}</em></p>
-                        {/* Add voting buttons */}
-                        <button onClick={() => handleVote(votable.votable_type, votable.id, 1)}>
-                            {votable.positive_label}
-                        </button>
-                        <button onClick={() => handleVote(votable.votable_type, votable.id, -1)}>
-                            {votable.negative_label}
-                        </button>
-                    </li>
-                ))}
-            </ul>
+        <div className="votables-container">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <h1>Vote On Everything.</h1>
+                <select
+                    value={orderBy}
+                    onChange={e => setOrderBy(e.target.value)}
+                    className="orderby-dropdown"
+                >
+                    <option value="created_at">Newest</option>
+                    <option value="votes">Most Votes</option>
+                    <option value="consensus">Consensus</option>
+                    <option value="popularity">Popularity</option>
+                </select>
+            </div>
+            <div className="votables-list">
+                {votables.map(votable => {
+                    const positiveLabel = VOTE_LABELS[votable.votable_type].positive;
+                    const negativeLabel = VOTE_LABELS[votable.votable_type].negative;
+
+                    return (
+                        <div className="votable-item" key={votable.id}>
+                            <div className="votable-content">
+                                <h6>{votable.votable_type}:</h6>
+                                <h6>{votable.title}</h6>
+                                <p>{votable.text}</p>
+                                <button
+                                    className="positive-button"
+                                    onClick={() => handleVote(votable.id, 1)}
+                                >
+                                    {positiveLabel}
+                                </button>
+                                <button
+                                    className="negative-button"
+                                    onClick={() => handleVote(votable.id, -1)}
+                                >
+                                    {negativeLabel}
+                                </button>
+                            </div>
+                            <div className="votable-stats">
+                                <PieChart votable={votable} />
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }

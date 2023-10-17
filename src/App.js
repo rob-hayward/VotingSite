@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Navbar from './components/Navbar';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AuthContext from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 import { configureAxios } from './axiosConfig';
+
+
 
 import Home from './views/Home';
 import Login from './views/Login';
@@ -28,6 +33,7 @@ function App() {
     return (
         <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
             <Router>
+                <Navbar isLoggedIn={isAuthenticated} />
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />

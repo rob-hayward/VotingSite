@@ -14,18 +14,18 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #f7f7f7; /* Lighter gray background */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #333; /* Dark text */
 }
 
 .App-link {
-  color: #61dafb;
+  color: #007bff; /* Bootstrap's default blue */
 }
 
 @keyframes App-logo-spin {
@@ -35,4 +35,50 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.navbar {
+  background-color: #f8f9fa; /* Bootstrap's default light navbar background */
+}
+
+.navbar-toggler-icon {
+  /* Adjust if needed */
+}
+
+/* Always show the toggler */
+.navbar-toggler {
+    display: block !important;
+}
+
+.navbar-collapse.collapse {
+    display: none !important;
+}
+
+.navbar-collapse.show {
+    display: block !important;
+}
+
+.navbar-toggler.dropdown-toggle::after {
+    display: none;
+}
+
+.custom-dropdown-menu {
+    left: auto !important;
+    right: 0;
+}
+
+a {
+  color: #007bff; /* Bootstrap's default blue links */
+}
+
+a:hover, a:focus {
+  color: #0056b3; /* Darken the blue on hover/focus */
+}
+
+.custom-logo-padding {
+    padding-left: 20px;  /* Adjust this value as desired */
+}
+
+.custom-bars-padding {
+    padding-right: 20px; /* Adjust this value as desired */
 }

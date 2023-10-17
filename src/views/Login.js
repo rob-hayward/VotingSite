@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
+import './Login.css';
 import axiosInstance from '../axiosConfig';
 import AuthContext from '../AuthContext';
-import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const { login } = useContext(AuthContext);
-    const navigate = useNavigate(); // 2. Call the hook
+    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -28,7 +29,7 @@ function Login() {
             setIsSuccess(true);
             login();
 
-            navigate('/dashboard'); // 3. Redirect to dashboard after login
+            navigate('/dashboard');
 
         } catch (error) {
             console.error("Error during login:", error.response.data);
@@ -39,19 +40,35 @@ function Login() {
             }
             setIsSuccess(false);
         }
-    }
+    };
 
-    // Return should be within the function
     return (
-        <div>
-            <h2>Login</h2>
-            {message && <div className={isSuccess ? "success-message" : "error-message"}>{message}</div>}
-            <form onSubmit={handleSubmit}>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-                <button type="submit">Login</button>
-            </form>
+        <div className="container login-container">
+            <div className="row justify-content-center">
+                <div className="col-md-8">
+                    <h2 className="text-center mb-4">Votable Login</h2>
+                    {message &&
+                        <div className={`alert ${isSuccess ? 'alert-success' : 'alert-danger'}`} role="alert">
+                            {message}
+                        </div>
+                    }
+                    <form onSubmit={handleSubmit} className="border p-4 rounded">
+                        <div className="mb-3">
+                            <label className="form-label">Username</label>
+                            <input type="text" className="form-control" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Email</label>
+                            <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Password</label>
+                            <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+                        </div>
+                        <button type="submit" className="login-button">Login</button>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }
